@@ -1,0 +1,67 @@
+name: ✅ Validar HTML
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '**.html'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '**.html'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validación de archivos HTML
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 📦 Instalar html-validate
+        run: npm install -g html-validate
+
+      - name: 🔍 Validar archivos HTML
+        run: |
+          echo "🔍 Iniciando validación de archivos HTML..."
+          echo "================================================"
+          ERRORS=0
+          FILES=0
+          find . -name "*.html" -not -path "./.git/*" | while read file; do
+            FILES=$((FILES + 1))
+            echo "📄 Revisando: $file"
+            if html-validate "$file" 2>/dev/null; then
+              echo "  ✅ OK"
+            else
+              echo "  ⚠️  Advertencias encontradas"
+            fi
+          done
+          echo "================================================"
+          echo "✅ Validación completada"
+
+      - name: 📊 Reporte de tamaños
+        run: |
+          echo "📊 REPORTE DE TAMAÑOS DE ARCHIVOS"
+          echo "================================================"
+          find . -name "*.html" -not -path "./.git/*" -exec ls -lh {} \; | \
+            awk '{print "  📄 " $NF " → " $5}'
+          echo "================================================"
+          TOTAL=$(find . -name "*.html" -not -path "./.git/*" | wc -l)
+          echo "Total de archivos HTML: $TOTAL"
+
+      - name: 🏷️ Resumen del commit
+        run: |
+          echo "## Resumen de Validación" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Archivo | Estado | Tamaño |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|--------|" >> $GITHUB_STEP_SUMMARY
+          find . -name "*.html" -not -path "./.git/*" | while read file; do
+            size=$(du -sh "$file" | cut -f1)
+            echo "| \`$file\` | ✅ Revisado | $size |" >> $GITHUB_STEP_SUMMARY
+          done

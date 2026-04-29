@@ -1,0 +1,79 @@
+name: 📦 Crear Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versión (ej: v1.2.0)'
+        required: true
+        default: 'v1.0.0'
+      notes:
+        description: 'Notas de la versión'
+        required: false
+        default: 'Actualización del sistema de calendarios Jasetron'
+      prerelease:
+        description: '¿Es una pre-release?'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    name: Generar Release ${{ github.event.inputs.version }}
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📊 Inventario del sistema
+        id: inventory
+        run: |
+          HTML_COUNT=$(find . -name "*.html" -not -path "./.git/*" | wc -l)
+          JSON_COUNT=$(find . -name "*.json" -not -path "./.git/*" | wc -l 2>/dev/null || echo 0)
+          TOTAL_SIZE=$(du -sh . --exclude=.git 2>/dev/null | cut -f1)
+          echo "html_count=$HTML_COUNT" >> $GITHUB_OUTPUT
+          echo "json_count=$JSON_COUNT" >> $GITHUB_OUTPUT
+          echo "total_size=$TOTAL_SIZE" >> $GITHUB_OUTPUT
+          echo "release_date=$(date '+%d/%m/%Y')" >> $GITHUB_OUTPUT
+
+      - name: 🏷️ Crear tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a ${{ github.event.inputs.version }} -m "Release ${{ github.event.inputs.version }}"
+          git push origin ${{ github.event.inputs.version }}
+
+      - name: 📦 Crear Release en GitHub
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          release_name: "🗓️ Jasetron Calendarios ${{ github.event.inputs.version }}"
+          prerelease: ${{ github.event.inputs.prerelease }}
+          body: |
+            ## 🗓️ Jasetron - Sistema de Calendarios ${{ github.event.inputs.version }}
+
+            **Fecha de release:** ${{ steps.inventory.outputs.release_date }}
+
+            ### 📝 Notas
+            ${{ github.event.inputs.notes }}
+
+            ### 📊 Contenido del sistema
+            - 📄 Archivos HTML: ${{ steps.inventory.outputs.html_count }}
+            - 📁 Proyectos JSON: ${{ steps.inventory.outputs.json_count }}
+            - 💾 Tamaño total: ${{ steps.inventory.outputs.total_size }}
+
+            ### 🌐 Acceso
+            La aplicación está disponible en:
+            👉 https://sombrerorojo7.github.io/jasetron-calendarios/
+
+            ### 📲 Contacto
+            **Jasetron Seguridad** · 25 años protegiendo Cuenca · 0967793615
