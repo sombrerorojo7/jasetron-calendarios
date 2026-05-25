@@ -1,19 +1,21 @@
-name: ✅ Validar HTML
+name: ✅ Validar sitio
 
 on:
   push:
     branches: [ main, develop ]
     paths:
       - '**.html'
+      - '**.json'
   pull_request:
     branches: [ main ]
     paths:
       - '**.html'
+      - '**.json'
 
 jobs:
   validate:
     runs-on: ubuntu-latest
-    name: Validación de archivos HTML
+    name: Validación de archivos del sitio
 
     steps:
       - name: 📥 Checkout
@@ -31,19 +33,40 @@ jobs:
         run: |
           echo "🔍 Iniciando validación de archivos HTML..."
           echo "================================================"
-          ERRORS=0
-          FILES=0
-          find . -name "*.html" -not -path "./.git/*" | while read file; do
-            FILES=$((FILES + 1))
+          failed=0
+          while IFS= read -r file; do
             echo "📄 Revisando: $file"
-            if html-validate "$file" 2>/dev/null; then
+            if html-validate "$file"; then
               echo "  ✅ OK"
             else
-              echo "  ⚠️  Advertencias encontradas"
+              echo "  ❌ Error de HTML"
+              failed=1
             fi
-          done
+          done < <(find . -name "*.html" -not -path "./.git/*" | sort)
           echo "================================================"
-          echo "✅ Validación completada"
+          if [ "$failed" -ne 0 ]; then
+            echo "❌ Hay archivos HTML con errores"
+            exit 1
+          fi
+          echo "✅ HTML validado"
+
+      - name: 🔍 Validar proyectos JSON
+        run: |
+          echo "🔍 Revisando archivos JSON..."
+          failed=0
+          while IFS= read -r file; do
+            echo "📄 Revisando: $file"
+            if node -e "JSON.parse(require('fs').readFileSync(process.argv[1], 'utf8'))" "$file"; then
+              echo "  ✅ OK"
+            else
+              echo "  ❌ JSON inválido"
+              failed=1
+            fi
+          done < <(find . -name "*.json" -not -path "./.git/*" | sort)
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
+          echo "✅ JSON validado"
 
       - name: 📊 Reporte de tamaños
         run: |
@@ -52,16 +75,22 @@ jobs:
           find . -name "*.html" -not -path "./.git/*" -exec ls -lh {} \; | \
             awk '{print "  📄 " $NF " → " $5}'
           echo "================================================"
-          TOTAL=$(find . -name "*.html" -not -path "./.git/*" | wc -l)
-          echo "Total de archivos HTML: $TOTAL"
+          HTML_TOTAL=$(find . -name "*.html" -not -path "./.git/*" | wc -l)
+          JSON_TOTAL=$(find . -name "*.json" -not -path "./.git/*" | wc -l)
+          echo "Total de archivos HTML: $HTML_TOTAL"
+          echo "Total de archivos JSON: $JSON_TOTAL"
 
       - name: 🏷️ Resumen del commit
         run: |
-          echo "## Resumen de Validación" >> $GITHUB_STEP_SUMMARY
+          echo "## Resumen de Validación del sitio" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Archivo | Estado | Tamaño |" >> $GITHUB_STEP_SUMMARY
           echo "|---------|--------|--------|" >> $GITHUB_STEP_SUMMARY
           find . -name "*.html" -not -path "./.git/*" | while read file; do
             size=$(du -sh "$file" | cut -f1)
-            echo "| \`$file\` | ✅ Revisado | $size |" >> $GITHUB_STEP_SUMMARY
+            echo "| \`$file\` | ✅ HTML válido | $size |" >> $GITHUB_STEP_SUMMARY
+          done
+          find . -name "*.json" -not -path "./.git/*" | while read file; do
+            size=$(du -sh "$file" | cut -f1)
+            echo "| \`$file\` | ✅ JSON válido | $size |" >> $GITHUB_STEP_SUMMARY
           done

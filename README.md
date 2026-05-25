@@ -91,24 +91,26 @@ Crea una versión etiquetada del sistema con inventario automático de archivos.
 ### Crear un nuevo calendario
 
 1. Abre el [Editor](https://sombrerorojo7.github.io/jasetron-calendarios/panel_jasetron_HORIZONTAL.html)
-2. Completa las publicaciones de la semana (Facebook e Instagram)
-3. Arrastra publicaciones entre días con **Drag & Drop**
+2. Importa el CSV desde **📊 Importar CSV** o completa las publicaciones manualmente
+3. Carga las imágenes con **🖼️ Cargar imágenes**; quedan guardadas dentro del JSON/HTML como datos del navegador
 4. Clic en **💾 Guardar** → descarga un archivo `.json`
-5. Sube el `.json` a la carpeta `proyectos/` en el repositorio
+5. Publica el archivo en el repo con `node scripts/publicar-calendario.js` cuando ya tengas tambien el HTML exportado
 
 ### Continuar un proyecto guardado
 
 1. Abre el Editor
 2. Clic en **📂 Cargar**
-3. Selecciona tu archivo `.json` de la carpeta `proyectos/`
+3. Selecciona tu archivo `.json` descargado desde `proyectos/`
 4. Continúa editando
 
 ### Exportar calendario para el cliente
 
 1. Cuando el calendario esté listo, clic en **📥 Exportar calendario**
 2. Se descarga un archivo `.html` autocontenido
-3. Súbelo a la carpeta `calendarios_finales/` del repositorio
-4. Comparte el enlace de GitHub Pages con el cliente
+3. Ejecuta `node scripts/publicar-calendario.js` desde el repo para copiar el JSON a `proyectos/`, el HTML a `calendarios_finales/` y actualizar las listas
+4. Haz commit/push y comparte el enlace de GitHub Pages con el cliente
+
+> Flujo recomendado: trabaja desde GitHub Pages o desde un servidor local (`http://localhost`), no abriendo el editor con `file://`. El editor usa APIs del navegador para leer CSV/JSON/imágenes y descarga los archivos generados sin depender de un servidor propio.
 
 ---
 
@@ -126,6 +128,30 @@ Crea una versión etiquetada del sistema con inventario automático de archivos.
 ---
 
 ## 🛠️ Desarrollo
+
+### Publicar lo descargado en las carpetas del repo
+
+Despues de guardar el JSON y exportar el HTML desde el navegador, corre:
+
+```bash
+node scripts/publicar-calendario.js
+```
+
+El script busca en `~/Downloads` el ultimo par `calendario_*.json` y `calendario_*.html`, valida que no esten vacios, los copia a `proyectos/` y `calendarios_finales/`, y actualiza los `manifest.json` para que aparezcan en los paneles.
+
+Tambien puedes indicar el nombre base:
+
+```bash
+node scripts/publicar-calendario.js calendario_jasetron_seguridad_mayo_junio_2026
+```
+
+### Probar el editor sin dependencias
+
+```bash
+node scripts/smoke-editor.js
+```
+
+Este smoke test simula importar CSV, cargar una imagen, guardar JSON, exportar HTML y valida que `file://` muestre aviso en vez de intentar escribir archivos locales.
 
 ### Hacer cambios y desplegar
 

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyectos Guardados - Sombrero Rojo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--title-font:'Bebas Neue','Arial Narrow',Impact,sans-serif}
+body{font-family:'Gill Sans','Segoe UI',Arial,sans-serif;background:#0d0d0d;color:#fff;min-height:100vh}
+header{background:#111;border-bottom:2px solid #ff0000;padding:20px 32px}
+.wrap{max-width:980px;margin:0 auto;padding:34px 24px}
+h1{font-family:var(--title-font);font-size:42px;font-weight:400;letter-spacing:1.2px}
+h1 span{color:#ff0000}
+.brand{display:flex;align-items:center;gap:18px}
+.brand img{height:64px;width:auto}
+.sub{color:#888;margin-top:8px;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:28px}
+.card{background:#171717;border:1px solid #292929;border-radius:10px;padding:20px}
+.card h2{font-family:var(--title-font);font-size:24px;font-weight:400;letter-spacing:.6px;margin-bottom:8px}
+.card p{font-size:13px;color:#888;line-height:1.55;margin-bottom:16px}
+.btn{display:inline-flex;text-decoration:none;background:#ff0000;color:#fff;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:700}
+.btn:hover{background:#aa0000}
+.ghost{background:#222;color:#ddd;margin-left:8px}
+.ghost:hover{background:#333}
+.note{border:1px dashed #333;border-radius:10px;padding:18px;color:#777;font-size:13px;margin-top:18px;line-height:1.6}
+footer{border-top:1px solid #1d1d1d;margin-top:34px;padding-top:18px;color:#666;font-size:12px}
+a{color:#ff4444}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <img src="../LOGO-HORIZONTAL-SR.png" alt="Sombrero Rojo Marketing Digital">
+    <div>
+      <h1>Proyectos <span>Guardados</span></h1>
+      <div class="sub">JSON para continuar editando · WhatsApp 0998068900 · sombrerorojo.net</div>
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <a href="../" class="btn ghost">Volver al inicio</a>
+  <a href="../panel_jasetron_HORIZONTAL.html" class="btn ghost">Abrir editor</a>
+  <div class="grid" id="project-list">
+    <article class="card">
+      <h2>Cargando proyectos...</h2>
+      <p>Buscando archivos JSON guardados en GitHub.</p>
+    </article>
+  </div>
+  <div class="note">
+    Los archivos JSON no son para el cliente final. Son tu respaldo de trabajo: los cargas en el editor, sigues editando y luego exportas un HTML para publicar.
+  </div>
+  <footer>Preparado por Sombrero Rojo · GitHub Pages</footer>
+</main>
+<script>
+const list = document.getElementById('project-list');
+function titleFromFile(name){
+  return name.replace(/\.json$/,'').replace(/[_-]+/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+}
+function renderProjects(projects){
+  if(!projects.length){
+    list.innerHTML = '<article class="card"><h2>No hay proyectos guardados</h2><p>Guarda un JSON desde el editor y subelo a esta carpeta.</p></article>';
+    return;
+  }
+  list.innerHTML = projects.map(f => '<article class="card"><h2>'+(f.title || titleFromFile(f.name || f.file))+'</h2><p>'+(f.description || 'Archivo editable. Descargalo y cargalo en el editor con el boton Cargar.')+'</p><a class="btn" href="'+(f.file || f.name)+'" download>Descargar JSON</a></article>').join('');
+}
+fetch('manifest.json', { cache: 'no-store' })
+  .then(r=>r.ok ? r.json() : Promise.reject(new Error('No se pudo leer manifest')))
+  .then(renderProjects)
+  .catch(()=>{
+    const repoApi = 'https://api.github.com/repos/sombrerorojo7/jasetron-calendarios/contents/proyectos?ref=main';
+    fetch(repoApi)
+      .then(r=>r.ok ? r.json() : Promise.reject(new Error('No se pudo leer GitHub')))
+      .then(files=>renderProjects(files.filter(f=>f.type === 'file' && /\.json$/i.test(f.name))))
+      .catch(()=>{
+        renderProjects([
+          { title: 'Jasetron Seguridad - Abril Mayo 2026', file: 'calendario_jasetron_seguridad_abril_mayo_2026.json', description: 'Archivo editable para continuar el calendario de Jasetron Seguridad.' },
+          { title: 'Abril 2026', file: 'abril_2026.json', description: 'Archivo editable de prueba.' }
+        ]);
+      });
+  });
+</script>
+</body>
+</html>
