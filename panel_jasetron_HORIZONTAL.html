@@ -145,6 +145,24 @@ input[type=date]:focus,select:focus{border-color:#ff0000;background:#fff}
 .protocol-warning{display:none;background:#fff2d6;border-bottom:1px solid #e7bf6a;color:#573b00;padding:12px 32px;font-size:13px;line-height:1.45}
 .protocol-warning strong{color:#8a0000}
 .protocol-warning.show{display:block}
+.btn-connect{padding:8px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:2px solid #555;background:transparent;color:#aaa;transition:all .2s;white-space:nowrap}
+.btn-connect:hover{border-color:#ff0000;color:#fff}
+.btn-connect.connected{border-color:#22cc66;color:#22cc66;background:rgba(34,204,102,.08)}
+.folder-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#555;margin-right:5px;vertical-align:middle;transition:background .2s}
+.btn-connect.connected .folder-dot{background:#22cc66}
+.publish-modal{background:#fff;border-radius:16px;padding:28px;max-width:540px;width:92%;box-shadow:0 8px 40px rgba(0,0,0,0.35)}
+.publish-modal h2{font-size:18px;font-weight:700;margin-bottom:6px}
+.publish-modal .sub{font-size:13px;color:#888;margin-bottom:18px}
+.link-box{background:#f4f4f4;border:1.5px solid #ddd;border-radius:8px;padding:12px 14px;font-size:12px;color:#333;margin-bottom:12px;display:flex;gap:10px;align-items:center}
+.link-box a{color:#ff0000;text-decoration:none;flex:1;word-break:break-all;font-size:12px}
+.link-box a:hover{text-decoration:underline}
+.btn-copy-link{flex-shrink:0;background:#ff0000;color:#fff;border:none;border-radius:7px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:background .2s}
+.btn-copy-link:hover{background:#cc0000}
+.publish-status{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:#555;background:#f8f8f8;border-radius:8px;padding:10px 14px;margin-bottom:16px;line-height:1.5}
+.publish-status .status-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.git-box{background:#111;border-radius:8px;padding:12px 14px 12px 14px;font-size:11px;font-family:monospace;color:#aaa;white-space:pre;margin-bottom:20px;position:relative;overflow:auto}
+.btn-copy-git{position:absolute;top:8px;right:8px;background:#333;color:#aaa;border:none;border-radius:5px;padding:4px 10px;font-size:10px;cursor:pointer}
+.btn-copy-git:hover{background:#555;color:#fff}
 </style>
 </head>
 <body>
@@ -170,6 +188,9 @@ input[type=date]:focus,select:focus{border-color:#ff0000;background:#fff}
     <input type="file" id="csv-file" accept=".csv,text/csv" style="display:none" onchange="importCSV(this)">
     <button class="btn-images" onclick="document.getElementById('images-file').click()">🖼️ Cargar imágenes</button>
     <input type="file" id="images-file" accept="image/png,image/jpeg,image/webp,image/gif,image/*" multiple style="display:none" onchange="importImages(this)">
+    <button class="btn-connect" id="btn-connect-folder" onclick="connectFolder()" title="Conectar carpeta local del proyecto para guardar/exportar directamente">
+      <span class="folder-dot"></span>Carpeta
+    </button>
     <div class="mode-btns">
       <button class="mode-btn active" onclick="setMode('editor')" id="btn-editor">✏️ Editor</button>
       <button class="mode-btn" onclick="setMode('preview')" id="btn-preview">👁️ Vista previa</button>
@@ -184,10 +205,10 @@ input[type=date]:focus,select:focus{border-color:#ff0000;background:#fff}
 
 <main id="main-area">
   <div class="stats">
-    <div class="stat"><div class="val" id="st-total">12</div><div class="lbl">Total</div></div>
-    <div class="stat"><div class="val" id="st-active">12</div><div class="lbl">Activos</div></div>
-    <div class="stat"><div class="val" id="st-final">9</div><div class="lbl">Finalizados</div></div>
-    <div class="stat"><div class="val" id="st-pend">3</div><div class="lbl">Pendientes</div></div>
+    <div class="stat"><div class="val" id="st-total">0</div><div class="lbl">Total</div></div>
+    <div class="stat"><div class="val" id="st-active">0</div><div class="lbl">Activos</div></div>
+    <div class="stat"><div class="val" id="st-final">0</div><div class="lbl">Finalizados</div></div>
+    <div class="stat"><div class="val" id="st-pend">0</div><div class="lbl">Pendientes</div></div>
   </div>
   <div class="project-settings">
     <div class="project-field">
@@ -196,7 +217,7 @@ input[type=date]:focus,select:focus{border-color:#ff0000;background:#fff}
     </div>
     <div class="project-field">
       <label>Calendario</label>
-      <input id="calendar-title" value="Abril - Mayo 2026" onchange="setMeta('calendarTitle', this.value)" oninput="setMeta('calendarTitle', this.value)">
+      <input id="calendar-title" value="" onchange="setMeta('calendarTitle', this.value)" oninput="setMeta('calendarTitle', this.value)">
     </div>
     <div class="project-field">
       <label>Preparado por</label>
@@ -210,7 +231,7 @@ input[type=date]:focus,select:focus{border-color:#ff0000;background:#fff}
 </main>
 
 <div class="bottom-bar">
-  <span class="bottom-note" id="bottom-note">12 publicaciones listas</span>
+  <span class="bottom-note" id="bottom-note">0 publicaciones activas</span>
   <div style="display:flex;gap:10px">
     <button class="btn-preview" onclick="setMode('preview')">👁️ Vista previa</button>
     <button class="btn-generate" onclick="exportCalendar()">📥 Exportar calendario</button>
@@ -259,8 +280,120 @@ input[type=date]:focus,select:focus{border-color:#ff0000;background:#fff}
   </div>
 </div>
 
+<div class="modal-bg" id="publish-modal" onclick="if(event.target===this) closePublishModal()">
+  <div class="publish-modal">
+    <h2>📤 Calendario listo</h2>
+    <p class="sub">Copia el enlace y compártelo con el cliente. Funciona en cuanto hagas <strong>git push</strong>.</p>
+    <div class="link-box">
+      <a id="publish-link" href="#" target="_blank">—</a>
+      <button class="btn-copy-link" onclick="copyClientLink()">📋 Copiar</button>
+    </div>
+    <div class="publish-status" id="publish-status">
+      <span class="status-icon" id="publish-status-icon">⏳</span>
+      <span id="publish-status-text">—</span>
+    </div>
+    <div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Comandos para publicar</div>
+    <div class="git-box"><button class="btn-copy-git" onclick="copyGitCommands()">Copiar</button><span id="git-commands-text"></span></div>
+    <div style="text-align:right">
+      <button class="btn-generate" onclick="closePublishModal()" style="padding:10px 24px">Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const IMGS = {};
+const PAGES_BASE = 'https://sombrerorojo7.github.io/jasetron-calendarios';
+
+let projectRootHandle = null;
+
+async function connectFolder() {
+  if (!('showDirectoryPicker' in window)) {
+    alert('Tu navegador no soporta esta función. Usa Chrome o Edge.');
+    return;
+  }
+  try {
+    projectRootHandle = await window.showDirectoryPicker({ mode: 'readwrite', id: 'jasetron-root' });
+    updateFolderBtn();
+    showToast('✅ Carpeta conectada: ' + projectRootHandle.name);
+  } catch(e) {
+    if (e.name !== 'AbortError') alert('No se pudo conectar la carpeta: ' + e.message);
+  }
+}
+
+function updateFolderBtn() {
+  const btn = document.getElementById('btn-connect-folder');
+  if (!btn) return;
+  if (projectRootHandle) {
+    btn.classList.add('connected');
+    btn.title = 'Carpeta conectada: ' + projectRootHandle.name + '. Clic para cambiar.';
+  } else {
+    btn.classList.remove('connected');
+    btn.title = 'Conectar carpeta local del proyecto para guardar/exportar directamente';
+  }
+}
+
+async function writeToFolder(rootHandle, subfolder, filename, content, mimeType) {
+  const subHandle = await rootHandle.getDirectoryHandle(subfolder, { create: true });
+  const fileHandle = await subHandle.getFileHandle(filename, { create: true });
+  const writable = await fileHandle.createWritable();
+  await writable.write(new Blob([content], { type: mimeType }));
+  await writable.close();
+}
+
+async function updateFolderManifest(rootHandle, subfolder, entry) {
+  const subHandle = await rootHandle.getDirectoryHandle(subfolder, { create: true });
+  let items = [];
+  try {
+    const mHandle = await subHandle.getFileHandle('manifest.json');
+    const file = await mHandle.getFile();
+    const parsed = JSON.parse(await file.text());
+    if (Array.isArray(parsed)) items = parsed;
+  } catch(e) {}
+  items = items.filter(i => i.file !== entry.file);
+  items.unshift(entry);
+  const mHandle = await subHandle.getFileHandle('manifest.json', { create: true });
+  const writable = await mHandle.createWritable();
+  await writable.write(JSON.stringify(items, null, 2) + '\n');
+  await writable.close();
+}
+
+function getClientLink() {
+  return PAGES_BASE + '/calendarios_finales/' + projectFileBase() + '.html';
+}
+
+function showPublishModal(savedToFolder) {
+  const link = getClientLink();
+  const linkEl = document.getElementById('publish-link');
+  linkEl.href = link;
+  linkEl.textContent = link;
+  const base = projectFileBase();
+  const gitCmds = 'git add proyectos calendarios_finales\ngit commit -m "publica calendario ' + base + '"\ngit push';
+  document.getElementById('git-commands-text').textContent = gitCmds;
+  const icon = document.getElementById('publish-status-icon');
+  const text = document.getElementById('publish-status-text');
+  if (savedToFolder) {
+    icon.textContent = '✅';
+    text.textContent = 'Archivos guardados en la carpeta del proyecto. Haz git push y el enlace estará activo.';
+  } else {
+    icon.textContent = '⚠️';
+    text.innerHTML = 'Archivos descargados en ~/Downloads. Antes del push corre: <code>node scripts/publicar-calendario.js</code>';
+  }
+  document.getElementById('publish-modal').classList.add('open');
+}
+
+function closePublishModal() {
+  document.getElementById('publish-modal').classList.remove('open');
+}
+
+function copyClientLink() {
+  const link = document.getElementById('publish-link').textContent;
+  navigator.clipboard.writeText(link).then(() => showToast('📋 Enlace copiado'));
+}
+
+function copyGitCommands() {
+  const cmds = document.getElementById('git-commands-text').textContent;
+  navigator.clipboard.writeText(cmds).then(() => showToast('📋 Comandos copiados'));
+}
 
 let posts = [];
 
@@ -932,15 +1065,32 @@ function confirmAddPost(){
 
 async function saveProject(){
   refreshMetaFromInputs();
-  const data = JSON.stringify({
-    version: 2,
-    meta: projectMeta,
-    weeks: weeks,
-    posts: posts
-  }, null, 2);
+  const data = JSON.stringify({ version: 2, meta: projectMeta, weeks: weeks, posts: posts }, null, 2);
+  const filename = projectFileBase() + '.json';
+  const title = [projectMeta.clientName, projectMeta.calendarTitle].filter(Boolean).join(' - ') || filename;
+
+  if (projectRootHandle) {
+    try {
+      await writeToFolder(projectRootHandle, 'proyectos', filename, data, 'application/json');
+      await updateFolderManifest(projectRootHandle, 'proyectos', {
+        title,
+        file: filename,
+        description: 'Archivo editable para continuar el calendario.'
+      });
+      showToast('💾 Guardado en proyectos/');
+      return;
+    } catch(e) {
+      if (e.name === 'NotAllowedError') {
+        projectRootHandle = null;
+        updateFolderBtn();
+      }
+      showToast('⚠️ Error en carpeta, descargando...');
+    }
+  }
+
   try {
-    const saved = await downloadFile(data, 'application/json', projectFileBase()+'.json');
-    if(saved) showToast('💾 Guardado');
+    const saved = await downloadFile(data, 'application/json', filename);
+    if (saved) showToast('💾 Guardado en Descargas');
   } catch(err) {
     alert('No se pudo guardar: ' + err.message);
   }
@@ -1010,12 +1160,39 @@ async function exportCalendar(){
   const clientLogoSrc = escHtml(getSiteAssetUrl('LOGO-HORIZONTAL-SR.png'));
   const html='<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Calendario '+clientName+'</title><style>@import url(\'https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap\');*{box-sizing:border-box;margin:0;padding:0}body{font-family:\'Gill Sans\',\'Segoe UI\',Arial,sans-serif;background:#0d0d0d;color:#f0f0f0}header{background:#111;border-bottom:2px solid #ff0000;padding:28px 40px;display:flex;align-items:center;justify-content:space-between}.logo-area{display:flex;align-items:center;gap:18px}.agency-logo{height:58px;width:auto}.logo-area h1{font-family:\'Bebas Neue\',\'Arial Narrow\',Impact,sans-serif;font-size:38px;font-weight:400;color:#fff;letter-spacing:1.2px;line-height:1}.logo-area h1 span{color:#ff0000}.logo-area p{font-size:13px;color:#999;margin-top:3px;letter-spacing:2px;text-transform:uppercase}.header-badge{background:#ff0000;color:#fff;font-size:13px;font-weight:700;padding:8px 20px;border-radius:30px}.month-title{text-align:center;font-family:\'Bebas Neue\',\'Arial Narrow\',Impact,sans-serif;font-size:48px;font-weight:400;letter-spacing:1px;color:#fff;padding:28px 0 32px}.month-title span{color:#ff0000}.week-section{padding:0 40px 40px}.week-header{display:flex;align-items:center;gap:14px;margin-bottom:20px}.week-dot{width:10px;height:10px;background:#ff0000;border-radius:50%}.week-header h2{font-family:\'Bebas Neue\',\'Arial Narrow\',Impact,sans-serif;font-size:22px;letter-spacing:3px;text-transform:uppercase;color:#666;font-weight:400}.week-line{flex:1;height:1px;background:#222}.posts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}.post-card{background:#161616;border:1px solid #252525;border-radius:12px;overflow:hidden;transition:transform .2s,border-color .2s;cursor:pointer}.post-card:hover{transform:translateY(-3px);border-color:#ff0000}.post-image-wrap{position:relative;width:100%;aspect-ratio:1/1;overflow:hidden;background:#111}.post-image-wrap img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}.post-card:hover img{transform:scale(1.05)}.pending-badge{position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;font-size:13px;color:#aaa;letter-spacing:2px;text-transform:uppercase}.post-info{padding:18px 20px}.post-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.post-date{font-size:12px;color:#ff0000;font-weight:700;letter-spacing:1px;text-transform:uppercase}.post-networks{display:flex;gap:6px}.net-tag{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase}.net-fb{background:#1a2a4a;color:#6090e0}.net-ig{background:#2a1a2a;color:#c060c0}.post-title{font-family:\'Bebas Neue\',\'Arial Narrow\',Impact,sans-serif;font-size:22px;font-weight:400;letter-spacing:.5px;color:#fff;margin-bottom:10px;line-height:1.15}.post-caption{font-size:12.5px;color:#888;line-height:1.6}.post-status{display:inline-flex;align-items:center;gap:5px;margin-top:14px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase}.status-dot{width:7px;height:7px;border-radius:50%}.status-finalizado .status-dot{background:#22cc66}.status-finalizado{color:#22cc66}.status-proceso .status-dot{background:#f0a020}.status-proceso{color:#f0a020}.status-programado .status-dot{background:#5599ff}.status-programado{color:#5599ff}footer{text-align:center;padding:32px;border-top:1px solid#1a1a1a;font-size:12px;color:#444;letter-spacing:2px;text-transform:uppercase}footer strong,footer a{color:#ff0000}footer a{text-decoration:none}.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:1000;align-items:center;justify-content:center;padding:40px}.lightbox.open{display:flex}.lightbox img{max-width:90%;max-height:90vh;object-fit:contain;border-radius:8px}.lightbox-close{position:absolute;top:20px;right:40px;background:none;border:none;color:#fff;font-size:48px;cursor:pointer;font-weight:200}.lightbox-close:hover{color:#ff0000}</style></head><body><header><div class="logo-area"><img class="agency-logo" src="'+clientLogoSrc+'" alt="'+escHtml(agencyName)+'"><div><h1>'+clientName+'</h1><p>Calendario de Publicaciones</p></div></div><div class="header-badge">'+calendarTitle+'</div></header><h2 class="month-title">Calendario de <span>Contenidos</span></h2>'+body+'<footer><strong>'+agencyName+'</strong> &nbsp;·&nbsp; Marketing Digital &nbsp;·&nbsp; <a href="https://wa.me/593'+agencyPhone.substring(1)+'">WhatsApp '+agencyPhone+'</a> &nbsp;·&nbsp; <a href="https://'+agencySite+'">'+agencySite+'</a></footer><div class="lightbox" id="lightbox" onclick="closeImg()"><button class="lightbox-close" onclick="closeImg()">×</button><img id="lightbox-img" src="" alt=""></div><script>function openImg(card){const img=card.querySelector(\'img\');if(!img)return;const src=img.getAttribute(\'data-full\')||img.src;document.getElementById(\'lightbox-img\').src=src;document.getElementById(\'lightbox\').classList.add(\'open\');}function closeImg(){document.getElementById(\'lightbox\').classList.remove(\'open\');}<\/script></body></html>';
 
-  try {
-    const saved = await downloadFile(html, 'text/html', projectFileBase()+'.html');
-    if(saved) showToast('📥 Exportado');
-  } catch(err) {
-    alert('No se pudo exportar: ' + err.message);
+  const filename = projectFileBase() + '.html';
+  const title = [projectMeta.clientName, projectMeta.calendarTitle].filter(Boolean).join(' - ') || filename;
+  let savedToFolder = false;
+
+  if (projectRootHandle) {
+    try {
+      await writeToFolder(projectRootHandle, 'calendarios_finales', filename, html, 'text/html');
+      await updateFolderManifest(projectRootHandle, 'calendarios_finales', {
+        title,
+        file: filename,
+        description: 'Calendario final publicado para cliente.'
+      });
+      savedToFolder = true;
+      showToast('📥 Exportado en calendarios_finales/');
+    } catch(e) {
+      if (e.name === 'NotAllowedError') {
+        projectRootHandle = null;
+        updateFolderBtn();
+      }
+      showToast('⚠️ Error en carpeta, descargando...');
+      try { await downloadFile(html, 'text/html', filename); } catch(_) {}
+    }
+  } else {
+    try {
+      const saved = await downloadFile(html, 'text/html', filename);
+      if (!saved) return;
+    } catch(err) {
+      alert('No se pudo exportar: ' + err.message);
+      return;
+    }
   }
+
+  showPublishModal(savedToFolder);
 }
 
 window.addEventListener('DOMContentLoaded', () => {
