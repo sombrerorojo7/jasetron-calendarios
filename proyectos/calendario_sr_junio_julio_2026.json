@@ -1,0 +1,113 @@
+{
+  "version": 2,
+  "meta": {
+    "clientName": "Sombrero Rojo",
+    "calendarTitle": "Junio - Julio 2026",
+    "agencyName": "Sombrero Rojo Marketing",
+    "agencyPhone": "0967793615"
+  },
+  "weeks": [
+    "Semana 1",
+    "Semana 2",
+    "Semana 3",
+    "Semana 4"
+  ],
+  "posts": [
+    {
+      "id": 1,
+      "csvNumber": "1",
+      "week": "Semana 1",
+      "date": "2026-06-16",
+      "title": "Caso Real — Llamada México",
+      "artDesc": "PROMPT FIREFLY/CANVA: Imagen profesional minimalista. Fondo beige claro (#e0d6c6). Centro: teléfono moderno con pantalla mostrando llamada entrante con bandera de México. Pin de ubicación con mapa de Ecuador/Cuenca. Línea de conexión entre ambos. Acento rojo (#ff0000) en pin ecuatoriano. Franja azul (#003399) inferior: 'MARKETING EN ACCIÓN'. Sin rostros. Formato 1080x1080.",
+      "caption": "🔵 LINKEDIN:\nUna empresa en Cuenca recibió una llamada desde México.\n\nNo la buscaron. No hicieron publicidad. No tenían miles de seguidores.\n\nSolo tenían una web bien hecha y aparecían en Google cuando alguien buscaba lo que hacían.\n\nEso es todo.\n\nEl cliente desde México los encontró porque estaban donde debían estar. En el momento correcto. Con la información correcta.\n\nMuchas empresas en Ecuador llevan años dependiendo de los mismos clientes de siempre. Y está bien — hasta que no está bien.\n\nInternet no reemplaza las relaciones. Pero sí abre puertas que el boca a boca nunca va a abrir.\n\n¿Tu empresa aparece cuando alguien busca lo que haces?\n\n#MarketingEnAcción #MarketingDigital #Ecuador #EmpresasEcuador\n\n---\n🔴 FACEBOOK:\nUna empresa de Cuenca recibió una llamada desde México gracias a su web.\n\nSin publicidad. Sin redes sociales activas. Solo una web bien posicionada en Google.\n\nCuando una empresa aparece donde debe aparecer, el mundo se hace más pequeño.\n\n¿La tuya aparece? 👇",
+      "status": "Pendiente",
+      "nets": [
+        "LI",
+        "FB"
+      ],
+      "imgKey": null,
+      "imgSrc": null
+    },
+    {
+      "id": 2,
+      "csvNumber": "2",
+      "week": "Semana 1",
+      "date": "2026-06-18",
+      "title": "Reflexión IA — Empresas Ecuatorianas",
+      "artDesc": "PROMPT FIREFLY/CANVA: Fondo azul oscuro (#003399). Iconos simples: chat WhatsApp, logo Google, símbolo IA. Colores: blanco y rojo (#ff0000). Texto central blanco: '¿Ya usas IA en tu negocio?' Subtexto: 'o todavía estás evaluando'. Franja beige (#e0d6c6) inferior con logo SR. Formato 1080x1080.",
+      "caption": "🔵 LINKEDIN:\nLa mayoría de empresas en Ecuador están usando IA sin saberlo.\n\nChatGPT para redactar correos. Google para buscar clientes. WhatsApp Business para atender consultas.\n\nEso ya es IA en acción.\n\nEl problema no es si usarla o no. El problema es usarla sin estrategia.\n\nUna empresa que usa IA para responder consultas a las 2am tiene ventaja sobre una que solo atiende de 8 a 5.\n\nNo se trata de tecnología. Se trata de no quedarse atrás mientras otros avanzan.\n\n¿Tu empresa ya está usando IA? ¿O todavía está evaluando si vale la pena?\n\n#MarketingEnAcción #InteligenciaArtificial #Ecuador #TransformaciónDigital\n\n---\n🔴 FACEBOOK:\nLa IA no es para empresas grandes. Es para empresas inteligentes.\n\nUna empresa pequeña en Cuenca que usa IA bien puede competir con una grande que no la usa.\n\n¿Ya la estás usando en tu negocio? 👇",
+      "status": "Pendiente",
+      "nets": [
+        "LI",
+        "FB"
+      ],
+      "imgKey": null,
+      "imgSrc": null
+    },
+    {
+      "id": 3,
+      "csvNumber": "3",
+      "week": "Semana 1",
+      "date": "2026-06-20",
+      "title": "Tutorial IA — Mensaje WhatsApp en 10 segundos",
+      "artDesc": "PROMPT FIREFLY/CANVA: Captura estilizada de ChatGPT con mensaje de prospección visible. Fondo blanco con borde redondeado. Flecha roja (#ff0000) señalando el resultado. Texto azul (#003399): '10 segundos vs 30 minutos'. Franja inferior beige: 'MARKETING EN ACCIÓN'. Formato 1080x1080.",
+      "caption": "🔵 LINKEDIN:\nUna cosa que puedes hacer con IA hoy mismo — sin pagar nada:\n\nAbre ChatGPT. Escribe esto:\n\n'Soy dueño de [tipo de empresa] en Ecuador. Necesito un mensaje de WhatsApp para contactar a un cliente potencial del sector [sector] que no me conoce. Debe ser corto, directo y sin sonar a spam.'\n\nEn 10 segundos tienes un mensaje listo.\n\nEso que antes tomaba 30 minutos pensando frente a la pantalla, ahora toma 10 segundos.\n\nNo es magia. Es una herramienta. Como el Excel, como el WhatsApp.\n\nEste viernes, pruébalo.\n\n#MarketingEnAcción #IA #ChatGPT #Ecuador #EmpresasEcuador\n\n---\n🔴 FACEBOOK:\n¿Todavía escribes tus mensajes de prospección a mano?\n\nAbre ChatGPT, describe tu empresa y tu cliente ideal, y pídele que redacte el mensaje.\n\n10 segundos. Listo. Gratis. 🚀\n\n¿Lo pruebas hoy? 👇",
+      "status": "Pendiente",
+      "nets": [
+        "LI",
+        "FB"
+      ],
+      "imgKey": null,
+      "imgSrc": null
+    },
+    {
+      "id": 4,
+      "csvNumber": "4",
+      "week": "Semana 2",
+      "date": "2026-06-23",
+      "title": "Antes/Después — Empresa Industrial",
+      "artDesc": "PROMPT FIREFLY/CANVA: Diseño dividido dos mitades. IZQUIERDA (antes): fondo gris, empresa industrial sin wifi, texto blanco 'ANTES: Solo clientes de siempre'. DERECHA (después): fondo azul (#003399), íconos Google+WhatsApp activos, texto blanco 'DESPUÉS: Clientes nuevos desde internet'. Línea divisoria roja (#ff0000). Formato 1080x1080.",
+      "caption": "🔵 LINKEDIN:\nANTES:\nEmpresa industrial en Ecuador. 15 años en el mercado. Buenos productos. Cero presencia digital.\nClientes: los mismos de siempre.\nEl problema: cuando esas relaciones se agotan, no hay plan B.\n\nDESPUÉS:\nWeb actualizada. Google My Business activo. Aparecen en búsquedas de su sector.\nResultado: primeras consultas de empresas que los encontraron solas.\n\nNo fue magia. Fue hacer lo básico bien.\n\nEse paso es lo que hacemos en Sombrero Rojo.\n\n¿En qué etapa está tu empresa?\n\n#MarketingEnAcción #IndustriaEcuador #DigitalizaciónEmpresarial\n\n---\n🔴 FACEBOOK:\nEmpresa con 15 años en el mercado. Productos excelentes. Cero presencia en internet.\n\nTrabajamos con ellos 60 días. Web, Google, posicionamiento básico.\n\nHoy reciben consultas de empresas que los encontraron solas. 💪\n\n¿Tu empresa está en el antes o en el después?",
+      "status": "Pendiente",
+      "nets": [
+        "LI",
+        "FB"
+      ],
+      "imgKey": null,
+      "imgSrc": null
+    },
+    {
+      "id": 5,
+      "csvNumber": "5",
+      "week": "Semana 2",
+      "date": "2026-06-25",
+      "title": "Reflexión — Clientes de siempre vs clientes nuevos",
+      "artDesc": "PROMPT FIREFLY/CANVA: Fondo beige (#e0d6c6). Izquierda: grupo personas conectadas (azul, clientes actuales). Derecha: interrogante con lupa (rojo, clientes futuros). Texto grande azul: 'Tus clientes actuales te conocen.' Segunda línea rojo: 'Los futuros te buscan en Google.' Franja azul inferior: 'MARKETING EN ACCIÓN'. Formato 1080x1080.",
+      "caption": "🔵 LINKEDIN:\nTus clientes actuales te conocen.\n\nSaben quién eres, qué haces, cómo trabajas.\n\nEso es valioso. Protégelo.\n\nPero los clientes futuros — los que todavía no saben que existes — te buscan en Google.\n\nNo preguntan a sus conocidos primero. Buscan en Google, ven tu web, evalúan en 8 segundos si vales su tiempo, y recién entonces contactan.\n\nSi no apareces, no existes para ellos.\n\n¿Tu empresa está visible para el cliente que todavía no te conoce?\n\n#MarketingEnAcción #Ecuador #EmpresasEcuador #CrecimientoEmpresarial\n\n---\n🔴 FACEBOOK:\nTus clientes actuales te conocen. 👍\nLos futuros te buscan en Google. 🔍\n\nSi no apareces ahí, no existen para ellos.\n\n¿Aparece tu empresa cuando buscan lo que vendes?",
+      "status": "Pendiente",
+      "nets": [
+        "LI",
+        "FB"
+      ],
+      "imgKey": null,
+      "imgSrc": null
+    },
+    {
+      "id": 6,
+      "csvNumber": "6",
+      "week": "Semana 2",
+      "date": "2026-06-27",
+      "title": "Detrás de cámaras — Cómo decidimos qué recomendar",
+      "artDesc": "PROMPT FIREFLY/CANVA: Fondo blanco. Ilustración minimalista mesa de trabajo con laptop y checklist. Azul (#003399) y rojo (#ff0000) como acentos. Texto azul bold: 'Lo que hacemos antes de recomendarte algo.' Checklist con ticks rojos. Franja beige: 'Sombrero Rojo — Marketing en Acción'. Formato 1080x1080.",
+      "caption": "🔵 LINKEDIN:\nAntes de recomendarle algo a un cliente, hacemos tres preguntas:\n\n1. ¿Esto resuelve un problema real o solo suena bien?\n2. ¿El cliente tiene capacidad de mantenerlo después?\n3. ¿Podemos medir si funciona?\n\nSi alguna respuesta es no, no lo recomendamos.\n\nHemos tenido clientes que llegaron pidiendo redes sociales cuando lo que necesitaban era arreglar su web primero.\n\nDecirle a un cliente lo que no quiere escuchar, pero que necesita saber, es parte del trabajo.\n\nNo vendemos servicios. Resolvemos problemas de marketing.\n\n#MarketingEnAcción #AgenciaMarketing #Ecuador\n\n---\n🔴 FACEBOOK:\nAntes de recomendarte algo, te preguntamos si realmente lo necesitas.\n\nA veces la respuesta es: no, primero haz esto otro.\n\nNo vendemos servicios. Resolvemos problemas.\n\nEsa es la diferencia entre una agencia y un aliado. 🤝",
+      "status": "Pendiente",
+      "nets": [
+        "LI",
+        "FB"
+      ],
+      "imgKey": null,
+      "imgSrc": null
+    }
+  ]
+}
