@@ -340,6 +340,37 @@ async function writeToFolder(rootHandle, subfolder, filename, content, mimeType)
   await writable.close();
 }
 
+async function getNestedDirectoryHandle(rootHandle, parts) {
+  let handle = rootHandle;
+  for (const part of parts) {
+    handle = await handle.getDirectoryHandle(part, { create: true });
+  }
+  return handle;
+}
+
+async function writeNestedFile(rootHandle, folderParts, filename, content, mimeType) {
+  const folderHandle = await getNestedDirectoryHandle(rootHandle, folderParts);
+  const fileHandle = await folderHandle.getFileHandle(filename, { create: true });
+  const writable = await fileHandle.createWritable();
+  await writable.write(content instanceof Blob ? content : new Blob([content], { type: mimeType }));
+  await writable.close();
+}
+
+function dataUrlToBlob(dataUrl) {
+  const match = /^data:([^;]+);base64,(.+)$/.exec(dataUrl || '');
+  if (!match) return null;
+  const binary = atob(match[2]);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: match[1] });
+}
+
+function imageExtensionFromDataUrl(dataUrl) {
+  const match = /^data:image\/([^;]+);base64,/.exec(dataUrl || '');
+  if (!match) return 'png';
+  return match[1] === 'jpeg' ? 'jpg' : match[1].toLowerCase();
+}
+
 async function updateFolderManifest(rootHandle, subfolder, entry) {
   const subHandle = await rootHandle.getDirectoryHandle(subfolder, { create: true });
   let items = [];
@@ -1136,6 +1167,32 @@ function showToast(msg){
 async function exportCalendar(){
   refreshMetaFromInputs();
   const active=posts.filter(p=>!p.deleted);
+  const filename = projectFileBase() + '.html';
+  const assetFolder = projectFileBase();
+  const exportImageSrc = {};
+
+  if (projectRootHandle) {
+    let imageIndex = 0;
+    for (const p of active) {
+      const imgSrc = getImg(p);
+      if (!imgSrc) continue;
+      if (!/^data:image\//.test(imgSrc)) {
+        exportImageSrc[p.id] = imgSrc;
+        continue;
+      }
+      const blob = dataUrlToBlob(imgSrc);
+      if (!blob) {
+        exportImageSrc[p.id] = imgSrc;
+        continue;
+      }
+      imageIndex += 1;
+      const ext = imageExtensionFromDataUrl(imgSrc);
+      const imageName = 'post-' + String(imageIndex).padStart(2, '0') + '.' + ext;
+      await writeNestedFile(projectRootHandle, ['calendarios_finales', 'assets', assetFolder], imageName, blob, blob.type);
+      exportImageSrc[p.id] = 'assets/' + assetFolder + '/' + imageName;
+    }
+  }
+
   let body='';
   
   weeks.forEach(week=>{
@@ -1143,10 +1200,10 @@ async function exportCalendar(){
     if(wPosts.length > 0){
       body+='<div class="week-section"><div class="week-header"><div class="week-dot"></div><h2>'+escHtml(week)+'</h2><div class="week-line"></div></div><div class="posts-grid">';
       wPosts.forEach(p=>{
-        const imgSrc=getImg(p);
+        const imgSrc=exportImageSrc[p.id] || getImg(p);
         const statusClass=p.status==='Finalizado'?'status-finalizado':p.status==='En Proceso'?'status-proceso':'status-programado';
         const netBadges=p.nets.map(n=>'<span class="net-tag '+(n==='FB'?'net-fb':'net-ig')+'">'+(n==='FB'?'Facebook':'Instagram')+'</span>').join('');
-        body+='<div class="post-card" onclick="openImg(this)"><div class="post-image-wrap">'+(imgSrc?'<img src="'+imgSrc+'" alt="'+escHtml(p.title)+'" data-full="'+imgSrc+'">':'<div class="pending-badge">Sin imagen</div>')+'</div><div class="post-info"><div class="post-meta"><span class="post-date">'+formatDate(p.date)+'</span><div class="post-networks">'+netBadges+'</div></div><p class="post-title">'+escHtml(p.title)+'</p><p class="post-caption">'+escHtml(p.caption)+'</p><div class="post-status '+statusClass+'"><div class="status-dot"></div>'+p.status+'</div></div></div>';
+        body+='<div class="post-card" onclick="openImg(this)"><div class="post-image-wrap">'+(imgSrc?'<img src="'+imgSrc+'" alt="'+escHtml(p.title)+'" data-full="'+imgSrc+'" loading="lazy" decoding="async">':'<div class="pending-badge">Sin imagen</div>')+'</div><div class="post-info"><div class="post-meta"><span class="post-date">'+formatDate(p.date)+'</span><div class="post-networks">'+netBadges+'</div></div><p class="post-title">'+escHtml(p.title)+'</p><p class="post-caption">'+escHtml(p.caption)+'</p><div class="post-status '+statusClass+'"><div class="status-dot"></div>'+p.status+'</div></div></div>';
       });
       body+='</div></div>';
     }
@@ -1160,7 +1217,6 @@ async function exportCalendar(){
   const clientLogoSrc = escHtml(getSiteAssetUrl('LOGO-HORIZONTAL-SR.png'));
   const html='<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Calendario '+clientName+'</title><style>@import url(\'https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap\');*{box-sizing:border-box;margin:0;padding:0}body{font-family:\'Gill Sans\',\'Segoe UI\',Arial,sans-serif;background:#0d0d0d;color:#f0f0f0}header{background:#111;border-bottom:2px solid #ff0000;padding:28px 40px;display:flex;align-items:center;justify-content:space-between}.logo-area{display:flex;align-items:center;gap:18px}.agency-logo{height:58px;width:auto}.logo-area h1{font-family:\'Bebas Neue\',\'Arial Narrow\',Impact,sans-serif;font-size:38px;font-weight:400;color:#fff;letter-spacing:1.2px;line-height:1}.logo-area h1 span{color:#ff0000}.logo-area p{font-size:13px;color:#999;margin-top:3px;letter-spacing:2px;text-transform:uppercase}.header-badge{background:#ff0000;color:#fff;font-size:13px;font-weight:700;padding:8px 20px;border-radius:30px}.month-title{text-align:center;font-family:\'Bebas Neue\',\'Arial Narrow\',Impact,sans-serif;font-size:48px;font-weight:400;letter-spacing:1px;color:#fff;padding:28px 0 32px}.month-title span{color:#ff0000}.week-section{padding:0 40px 40px}.week-header{display:flex;align-items:center;gap:14px;margin-bottom:20px}.week-dot{width:10px;height:10px;background:#ff0000;border-radius:50%}.week-header h2{font-family:\'Bebas Neue\',\'Arial Narrow\',Impact,sans-serif;font-size:22px;letter-spacing:3px;text-transform:uppercase;color:#666;font-weight:400}.week-line{flex:1;height:1px;background:#222}.posts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}.post-card{background:#161616;border:1px solid #252525;border-radius:12px;overflow:hidden;transition:transform .2s,border-color .2s;cursor:pointer}.post-card:hover{transform:translateY(-3px);border-color:#ff0000}.post-image-wrap{position:relative;width:100%;aspect-ratio:1/1;overflow:hidden;background:#111}.post-image-wrap img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}.post-card:hover img{transform:scale(1.05)}.pending-badge{position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;font-size:13px;color:#aaa;letter-spacing:2px;text-transform:uppercase}.post-info{padding:18px 20px}.post-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.post-date{font-size:12px;color:#ff0000;font-weight:700;letter-spacing:1px;text-transform:uppercase}.post-networks{display:flex;gap:6px}.net-tag{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase}.net-fb{background:#1a2a4a;color:#6090e0}.net-ig{background:#2a1a2a;color:#c060c0}.post-title{font-family:\'Bebas Neue\',\'Arial Narrow\',Impact,sans-serif;font-size:22px;font-weight:400;letter-spacing:.5px;color:#fff;margin-bottom:10px;line-height:1.15}.post-caption{font-size:12.5px;color:#888;line-height:1.6}.post-status{display:inline-flex;align-items:center;gap:5px;margin-top:14px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase}.status-dot{width:7px;height:7px;border-radius:50%}.status-finalizado .status-dot{background:#22cc66}.status-finalizado{color:#22cc66}.status-proceso .status-dot{background:#f0a020}.status-proceso{color:#f0a020}.status-programado .status-dot{background:#5599ff}.status-programado{color:#5599ff}footer{text-align:center;padding:32px;border-top:1px solid#1a1a1a;font-size:12px;color:#444;letter-spacing:2px;text-transform:uppercase}footer strong,footer a{color:#ff0000}footer a{text-decoration:none}.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:1000;align-items:center;justify-content:center;padding:40px}.lightbox.open{display:flex}.lightbox img{max-width:90%;max-height:90vh;object-fit:contain;border-radius:8px}.lightbox-close{position:absolute;top:20px;right:40px;background:none;border:none;color:#fff;font-size:48px;cursor:pointer;font-weight:200}.lightbox-close:hover{color:#ff0000}</style></head><body><header><div class="logo-area"><img class="agency-logo" src="'+clientLogoSrc+'" alt="'+escHtml(agencyName)+'"><div><h1>'+clientName+'</h1><p>Calendario de Publicaciones</p></div></div><div class="header-badge">'+calendarTitle+'</div></header><h2 class="month-title">Calendario de <span>Contenidos</span></h2>'+body+'<footer><strong>'+agencyName+'</strong> &nbsp;·&nbsp; Marketing Digital &nbsp;·&nbsp; <a href="https://wa.me/593'+agencyPhone.substring(1)+'">WhatsApp '+agencyPhone+'</a> &nbsp;·&nbsp; <a href="https://'+agencySite+'">'+agencySite+'</a></footer><div class="lightbox" id="lightbox" onclick="closeImg()"><button class="lightbox-close" onclick="closeImg()">×</button><img id="lightbox-img" src="" alt=""></div><script>function openImg(card){const img=card.querySelector(\'img\');if(!img)return;const src=img.getAttribute(\'data-full\')||img.src;document.getElementById(\'lightbox-img\').src=src;document.getElementById(\'lightbox\').classList.add(\'open\');}function closeImg(){document.getElementById(\'lightbox\').classList.remove(\'open\');}<\/script></body></html>';
 
-  const filename = projectFileBase() + '.html';
   const title = [projectMeta.clientName, projectMeta.calendarTitle].filter(Boolean).join(' - ') || filename;
   let savedToFolder = false;
 
