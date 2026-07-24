@@ -415,7 +415,8 @@ function showPublishModal(savedToFolder) {
   linkEl.href = link;
   linkEl.textContent = link;
   const base = projectFileBase();
-  const gitCmds = 'git add proyectos calendarios_finales\ngit commit -m "publica calendario ' + base + '"\ngit push';
+  const optimizeCmd = 'node scripts/optimizar-calendario.js "' + base + '"';
+  const gitCmds = optimizeCmd + '\ngit add proyectos calendarios_finales\ngit commit -m "publica calendario ' + base + '"\ngit push';
   document.getElementById('git-commands-text').textContent = gitCmds;
   const icon = document.getElementById('publish-status-icon');
   const text = document.getElementById('publish-status-text');
