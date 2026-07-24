@@ -128,8 +128,8 @@ async function runHappyPath() {
   };
 
   const csv = [
-    'Post #;Semana;Fecha Estimada;Titulo;Copy;Estado',
-    '1;Semana Test;25/05/2026;Prueba CSV;Copy desde CSV;Programado'
+    'Post #;Semana;Fecha Estimada;Titulo;Asset;Copy;Estado',
+    '1;Semana Test;25/05/2026;Prueba CSV;post 1.png;Copy desde CSV;Programado'
   ].join('\n');
 
   context.importCSV({files: [{text: csv}], value: 'csv'});
@@ -200,12 +200,50 @@ async function runFileProtocolGuard() {
   }
 }
 
+async function runMediaPath() {
+  const context = createContext('https:');
+  vm.createContext(context);
+  vm.runInContext(scriptMatch[1], context);
+
+  const csv = [
+    'Post #;Semana;Fecha;Titulo;Tipo;Arte (Archivo);Copy;Estado',
+    '1;Semana Reel;25/08/2026;Reel de prueba;Reel;reel-01.mp4;Copy del reel;En Proceso',
+    '2;Semana Reel;27/08/2026;Imagen de prueba;2x;ubicacion.png;Copy de imagen;Programado'
+  ].join('\n');
+
+  context.importCSV({files: [{text: csv}], value: 'csv'});
+  context.importMedia({
+    files: [{
+      name: 'ubicacion.png',
+      type: 'image/png',
+      dataUrl: 'data:image/png;base64,SMOKEIMAGE'
+    }, {
+      name: 'reel-01.mp4',
+      type: 'video/mp4',
+      dataUrl: 'data:video/mp4;base64,SMOKEREEL'
+    }],
+    value: 'media'
+  });
+
+  await Promise.resolve();
+  const post = vm.runInContext('posts[0]', context);
+  const imagePost = vm.runInContext('posts[1]', context);
+  if (!post || post.mediaType !== 'video') throw new Error('El CSV/reel no quedo marcado como video.');
+  if (!post.videoSrc || !post.videoSrc.includes('data:video/mp4')) throw new Error('El video no se cargo en el proyecto.');
+  if (!imagePost.imgSrc || !imagePost.imgSrc.includes('data:image/png')) throw new Error('La imagen no se asigno por nombre de archivo.');
+  const card = context.renderPostCard(post);
+  if (!card.includes('<video') || !card.includes('REEL')) throw new Error('El editor no renderizo la tarjeta del reel.');
+  return {mediaType: post.mediaType, cardIncludesVideo: true};
+}
+
 (async () => {
   const result = await runHappyPath();
+  const media = await runMediaPath();
   await runFileProtocolGuard();
   console.log(JSON.stringify({
     ok: true,
-    result
+    result,
+    media
   }, null, 2));
 })().catch(error => {
   console.error(error);

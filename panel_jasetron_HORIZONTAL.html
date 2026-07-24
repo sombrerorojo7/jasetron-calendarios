@@ -60,7 +60,9 @@ main{padding:20px 24px;min-height:calc(100vh - 180px);overflow-x:auto}
 .card-header input{flex:1;font-size:13px;font-weight:600;border:none;background:transparent;outline:none;color:#1a1a1a;padding:0}
 .card-header input:focus{background:#fff;padding:4px 8px;border-radius:4px}
 .img-zone{position:relative;width:100%;aspect-ratio:16/9;background:#f0f0f0;overflow:hidden}
-.img-zone img{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;transition:transform .2s}
+.img-zone img,.img-zone video{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;transition:transform .2s}
+.img-zone video{background:#111}
+.media-badge{position:absolute;top:8px;left:8px;background:rgba(255,0,0,.9);color:#fff;font-size:10px;font-weight:700;padding:4px 8px;border-radius:12px;z-index:4;letter-spacing:.5px}
 .img-zone img:hover{transform:scale(1.05)}
 .img-change-btn{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.7);color:#fff;border:none;padding:6px 12px;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;transition:all .2s;z-index:5}
 .img-change-btn:hover{background:rgba(255,0,0,0.9)}
@@ -111,7 +113,7 @@ input[type=date]:focus,select:focus{border-color:#ff0000;background:#fff}
 .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:2000;align-items:center;justify-content:center;padding:40px}
 .lightbox.open{display:flex}
 .lightbox-content{max-width:90%;max-height:90%;position:relative}
-.lightbox-content img{max-width:100%;max-height:90vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.lightbox-content img,.lightbox-content video{max-width:100%;max-height:90vh;object-fit:contain;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
 .lightbox-close{position:absolute;top:-40px;right:0;background:none;border:none;color:#fff;font-size:36px;cursor:pointer;font-weight:300;transition:transform .2s}
 .lightbox-close:hover{transform:scale(1.2)}
 #preview-view{display:none;padding:20px}
@@ -121,7 +123,8 @@ input[type=date]:focus,select:focus{border-color:#ff0000;background:#fff}
 .preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:20px}
 .preview-card{background:#161616;border-radius:10px;overflow:hidden;border:1px solid #252525;cursor:pointer;transition:all .2s}
 .preview-card:hover{transform:translateY(-4px);border-color:#ff0000}
-.preview-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+.preview-card img,.preview-card video{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+.preview-card video{background:#111}
 .preview-no-img{width:100%;aspect-ratio:1/1;background:#1a1a1a;display:flex;align-items:center;justify-content:center;color:#444;font-size:13px}
 .preview-info{padding:12px}
 .preview-date{font-size:11px;color:#ff0000;font-weight:700;margin-bottom:4px}
@@ -172,7 +175,7 @@ input[type=date]:focus,select:focus{border-color:#ff0000;background:#fff}
     <img src="LOGO-HORIZONTAL-SR.png" alt="Sombrero Rojo Marketing Digital">
     <div class="brand-copy">
       <h1>Editor de <span>Calendarios</span></h1>
-      <p>Sombrero Rojo Marketing Digital</p>
+      <p>Sombrero Rojo Marketing Digital · v2.1 multimedia</p>
       <div class="brand-links">
         <a href="https://wa.me/593998068900" target="_blank">WhatsApp 0998068900</a>
         <a href="index.html">Inicio</a>
@@ -186,8 +189,8 @@ input[type=date]:focus,select:focus{border-color:#ff0000;background:#fff}
     <input type="file" id="load-file" accept=".json" style="display:none" onchange="loadProject(this)">
     <button class="btn-import" onclick="document.getElementById('csv-file').click()">📊 Importar CSV</button>
     <input type="file" id="csv-file" accept=".csv,text/csv" style="display:none" onchange="importCSV(this)">
-    <button class="btn-images" onclick="document.getElementById('images-file').click()">🖼️ Cargar imágenes</button>
-    <input type="file" id="images-file" accept="image/png,image/jpeg,image/webp,image/gif,image/*" multiple style="display:none" onchange="importImages(this)">
+    <button class="btn-images" onclick="document.getElementById('images-file').click()">🖼️ Cargar medios</button>
+    <input type="file" id="images-file" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/quicktime" multiple style="display:none" onchange="importMedia(this)">
     <button class="btn-connect" id="btn-connect-folder" onclick="connectFolder()" title="Conectar carpeta local del proyecto para guardar/exportar directamente">
       <span class="folder-dot"></span>Carpeta
     </button>
@@ -303,6 +306,7 @@ input[type=date]:focus,select:focus{border-color:#ff0000;background:#fff}
 <script>
 const IMGS = {};
 const PAGES_BASE = 'https://sombrerorojo7.github.io/jasetron-calendarios';
+const EDITOR_VERSION = '2.1.0';
 
 let projectRootHandle = null;
 
@@ -369,6 +373,19 @@ function imageExtensionFromDataUrl(dataUrl) {
   const match = /^data:image\/([^;]+);base64,/.exec(dataUrl || '');
   if (!match) return 'png';
   return match[1] === 'jpeg' ? 'jpg' : match[1].toLowerCase();
+}
+
+function mediaExtensionFromDataUrl(dataUrl) {
+  const match = /^data:([^;]+);base64,/.exec(dataUrl || '');
+  if (!match) return 'bin';
+  const mime = match[1].toLowerCase();
+  if (mime === 'image/jpeg') return 'jpg';
+  if (mime === 'image/png') return 'png';
+  if (mime === 'image/webp') return 'webp';
+  if (mime === 'video/mp4') return 'mp4';
+  if (mime === 'video/webm') return 'webm';
+  if (mime === 'video/quicktime') return 'mov';
+  return mime.split('/')[1] || 'bin';
 }
 
 async function updateFolderManifest(rootHandle, subfolder, entry) {
@@ -447,12 +464,49 @@ function getImg(p) {
   return null;
 }
 
+function getMediaType(p) {
+  const explicit = normalizeText(p.mediaType || p.type || p.formato || '');
+  if (explicit.includes('reel') || explicit.includes('video') || explicit === 'mp4') return 'video';
+  const source = p.videoSrc || p.mediaSrc || p.file || p.asset || '';
+  if (/\.(mp4|webm|mov|m4v)(\?|$)/i.test(source)) return 'video';
+  return 'image';
+}
+
+function getVideo(p) {
+  return p.videoSrc || (getMediaType(p) === 'video' ? p.imgSrc : null) || null;
+}
+
+function getMediaSrc(p) {
+  return getMediaType(p) === 'video' ? getVideo(p) : getImg(p);
+}
+
+function getPoster(p) {
+  return p.posterSrc || p.poster || (getMediaType(p) === 'image' ? getImg(p) : null);
+}
+
+function mediaLabel(p) {
+  return getMediaType(p) === 'video' ? 'REEL' : 'IMAGEN';
+}
+
+function renderEditorMedia(p) {
+  const type = getMediaType(p);
+  const src = type === 'video' ? getVideo(p) : getImg(p);
+  const poster = getPoster(p);
+  if (!src) {
+    return '<div class="no-img" onclick="triggerImgUpload('+p.id+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>Agregar imagen o reel</span></div>';
+  }
+  if (type === 'video') {
+    return '<span class="media-badge">REEL</span><video src="'+escHtml(src)+'"'+(poster?' poster="'+escHtml(poster)+'"':'')+' controls muted playsinline preload="metadata" onclick="event.stopPropagation()"></video><button class="img-change-btn" onclick="event.stopPropagation();triggerImgUpload('+p.id+')">✏️ Cambiar medio</button>';
+  }
+  return '<span class="media-badge">IMAGEN</span><img src="'+escHtml(src)+'" alt="img" onclick="event.stopPropagation();openLightbox(\''+escJs(src)+'\')"><button class="img-change-btn" onclick="event.stopPropagation();triggerImgUpload('+p.id+')">✏️ Cambiar medio</button>';
+}
+
 function updateStats() {
   const active = posts.filter(p=>!p.deleted);
   document.getElementById('st-total').textContent = posts.length;
   document.getElementById('st-active').textContent = active.length;
-  document.getElementById('st-final').textContent = active.filter(p=>p.status==='Finalizado').length;
-  document.getElementById('st-pend').textContent = active.filter(p=>p.status!=='Finalizado').length;
+  document.getElementById('st-final').textContent = active.filter(p=>p.status==='Finalizado' || p.status==='Publicado').length;
+  document.getElementById('st-pend').textContent = active.filter(p=>p.status!=='Finalizado' && p.status!=='Publicado').length;
   document.getElementById('bottom-note').textContent = active.length + ' publicaciones activas';
 }
 
@@ -488,12 +542,8 @@ function renderEditor() {
 }
 
 function renderPostCard(p) {
-  const imgSrc = getImg(p);
-  const imgHtml = imgSrc
-    ? '<img src="'+imgSrc+'" alt="img" onclick="openLightbox(\''+imgSrc+'\')">' +
-      '<button class="img-change-btn" onclick="event.stopPropagation();triggerImgUpload('+p.id+')">✏️ Cambiar</button>'
-    : '<div class="no-img" onclick="triggerImgUpload('+p.id+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>Agregar imagen</span></div>';
-  const statusClass = p.status==='Finalizado'?'s-final':p.status==='En Proceso'?'s-proceso':'s-prog';
+  const imgHtml = renderEditorMedia(p);
+  const statusClass = p.status==='Finalizado' || p.status==='Publicado'?'s-final':p.status==='En Proceso'?'s-proceso':'s-prog';
   const isNew = p.isNew === true;
   
   return '<div class="post-card'+(isNew?' new-post':'')+'" id="card-'+p.id+'" draggable="true" ondragstart="dragStart(event, '+p.id+')" ondragend="dragEnd(event)" ondragover="cardDragOver(event, '+p.id+')" ondragleave="cardDragLeave(event)">' +
@@ -503,7 +553,7 @@ function renderPostCard(p) {
     '</div>' +
     '<div class="img-zone">' +
       imgHtml +
-      '<input type="file" id="file-'+p.id+'" accept="image/*" onchange="handleImgChange('+p.id+', this)">' +
+      '<input type="file" id="file-'+p.id+'" accept="image/png,image/jpeg,image/webp,image/gif,video/mp4,video/webm,video/quicktime" onchange="handleMediaChange('+p.id+', this)">' +
     '</div>' +
     '<div class="post-body">' +
       '<div class="field-row">' +
@@ -514,6 +564,7 @@ function renderPostCard(p) {
         '<span class="field-label">Estado</span>' +
         '<select onchange="setField('+p.id+',\'status\',this.value)" style="flex:1">' +
           '<option'+(p.status==='Finalizado'?' selected':'')+'>Finalizado</option>' +
+          '<option'+(p.status==='Publicado'?' selected':'')+'>Publicado</option>' +
           '<option'+(p.status==='En Proceso'?' selected':'')+'>En Proceso</option>' +
           '<option'+(p.status==='Programado'?' selected':'')+'>Programado</option>' +
         '</select>' +
@@ -649,6 +700,17 @@ function drop(e) {
   draggedOverCard = null;
 }
 
+function renderPreviewMedia(p) {
+  const type = getMediaType(p);
+  const src = type === 'video' ? getVideo(p) : getImg(p);
+  const poster = getPoster(p);
+  if (!src) return '<div class="preview-no-img">Sin medio</div>';
+  if (type === 'video') {
+    return '<div style="position:relative"><span class="media-badge">REEL</span><video src="'+escHtml(src)+'"'+(poster?' poster="'+escHtml(poster)+'"':'')+' controls muted playsinline preload="metadata" onclick="event.stopPropagation()"></video></div>';
+  }
+  return '<img src="'+escHtml(src)+'" alt="'+escHtml(p.title)+'" onclick="event.stopPropagation();openLightbox(\''+escJs(src)+'\')">';
+}
+
 function renderPreview() {
   const active = posts.filter(p=>!p.deleted);
   let html = '<div class="preview-container"><h2 class="preview-title">'+escHtml(projectMeta.clientName)+' — Vista Previa</h2>';
@@ -658,14 +720,9 @@ function renderPreview() {
     if (wPosts.length > 0) {
       html += '<div class="preview-week">'+week+'</div><div class="preview-grid">';
       wPosts.forEach(p => {
-        const imgSrc = getImg(p);
         const statusColor = p.status==='Finalizado'?'#22cc66':p.status==='En Proceso'?'#f0a020':'#5599ff';
-        html += '<div class="preview-card" onclick="openLightbox(\''+(imgSrc||'')+'\')"><div>';
-        if(imgSrc) {
-          html += '<img src="'+imgSrc+'">';
-        } else {
-          html += '<div class="preview-no-img">Sin imagen</div>';
-        }
+        html += '<div class="preview-card"><div>';
+        html += renderPreviewMedia(p);
         html += '</div><div class="preview-info">' +
             '<div class="preview-date">'+formatDate(p.date)+'</div>' +
             '<div class="preview-ptitle">'+escHtml(p.title)+'</div>' +
@@ -782,10 +839,14 @@ function importCSV(input){
           title: pickColumn(row, headers, ['Título/Concepto', 'Titulo/Concepto', 'Título', 'Titulo', 'Concepto / Tema', 'Concepto', 'Tema']) || 'Publicación ' + (index + 1),
           artDesc: pickColumn(row, headers, ['Arte Final (Descripción)', 'Arte Final', 'Descripcion', 'Descripción']),
           caption: pickColumn(row, headers, ['Copy (Meta Ads)', 'Copy', 'Caption', 'Texto', 'Contenido', 'Mensaje', 'Descripción del post', 'Descripcion del post']) || pickColumnContains(row, headers, ['copy', 'caption', 'texto', 'contenido', 'mensaje']) || '',
+          mediaType: pickColumn(row, headers, ['Tipo', 'Tipo de recurso', 'Formato', 'Media']) || '',
+          mediaFile: pickColumn(row, headers, ['Arte (Archivo)', 'Archivo', 'Media (Archivo)', 'Asset', 'asset', 'Reel', 'Video']) || '',
           status: pickColumn(row, headers, ['Estado']) || 'Programado',
           nets: ['FB', 'IG'],
           imgKey: null,
           imgSrc: null,
+          videoSrc: null,
+          posterSrc: null,
           deleted: false
         };
       });
@@ -827,11 +888,16 @@ function naturalImageSort(a,b){
   return a.name.localeCompare(b.name, undefined, {numeric:true, sensitivity:'base'});
 }
 
-function importImages(input){
+function normalizeMediaFilename(value){
+  const raw = String(value || '').split(/[\\/]/).pop().trim();
+  return normalizeText(raw).replace(/\s+/g, '');
+}
+
+function importMedia(input){
   if(!input.files || !input.files.length) return;
-  const files = Array.from(input.files).filter(file=>file.type.startsWith('image/')).sort(naturalImageSort);
+  const files = Array.from(input.files).filter(file=>file.type.startsWith('image/') || file.type.startsWith('video/')).sort(naturalImageSort);
   if(!files.length){
-    alert('No encontré imágenes en la selección.');
+    alert('No encontré imágenes ni videos en la selección.');
     input.value = '';
     return;
   }
@@ -843,32 +909,50 @@ function importImages(input){
   }
   const used = new Set();
   const jobs = [];
+  const unmatched = [];
   activePosts.forEach((post, index) => {
-    const wanted = extractImageNumbers([post.artDesc, post.title, post.csvNumber].join(' '));
-    let file = files.find(f => !used.has(f) && wanted.some(n => extractImageNumbers(f.name).includes(n)));
-    if(!file) file = files.find(f => !used.has(f));
-    if(!file) return;
+    const expectedName = normalizeMediaFilename(post.mediaFile);
+    let file = files.find(f => !used.has(f) && expectedName && normalizeMediaFilename(f.name) === expectedName);
+    if(!file){
+      unmatched.push(expectedName || ('fila ' + (index + 1)));
+      return;
+    }
     used.add(file);
     jobs.push(new Promise(resolve => {
       const reader = new FileReader();
       reader.onload = e => {
-        post.imgSrc = e.target.result;
-        post.imgKey = null;
+        if (file.type.startsWith('video/')) {
+          post.mediaType = 'video';
+          post.videoSrc = e.target.result;
+          post.imgSrc = null;
+          post.imgKey = null;
+        } else if (getMediaType(post) === 'video' && !post.videoSrc) {
+          post.posterSrc = e.target.result;
+        } else {
+          post.mediaType = 'image';
+          post.imgSrc = e.target.result;
+          post.imgKey = null;
+        }
         resolve();
       };
       reader.readAsDataURL(file);
     }));
   });
   if(!jobs.length){
-    alert('No pude asignar imágenes. Revisa que existan publicaciones activas.');
+    alert('No encontré coincidencias exactas entre el CSV y los archivos seleccionados. Revisa la columna asset y los nombres reales.');
     input.value = '';
     return;
   }
   Promise.all(jobs).then(() => {
     renderEditor();
-    showToast('🖼️ Imágenes cargadas: ' + jobs.length);
+    const suffix = unmatched.length ? ' · Sin coincidencia: ' + unmatched.slice(0, 3).join(', ') + (unmatched.length > 3 ? '…' : '') : '';
+    showToast('🖼️ Medios coincidentes por nombre: ' + jobs.length + suffix);
     input.value = '';
   });
+}
+
+function importImages(input){
+  importMedia(input);
 }
 
 function setMeta(field,value){
@@ -1042,14 +1126,32 @@ function closeModal(){
 
 function triggerImgUpload(id){ document.getElementById('file-'+id).click(); }
 
-function handleImgChange(id,input){
+function handleMediaChange(id,input){
   if(!input.files||!input.files[0]) return;
+  const file = input.files[0];
   const reader=new FileReader();
   reader.onload=e=>{
     const p=posts.find(p=>p.id===id);
-    if(p){ p.imgSrc=e.target.result; p.imgKey=null; renderEditor(); }
+    if(!p) return;
+    if(file.type.startsWith('video/')){
+      p.mediaType='video';
+      p.videoSrc=e.target.result;
+      p.imgSrc=null;
+      p.imgKey=null;
+    } else {
+      p.mediaType='image';
+      p.imgSrc=e.target.result;
+      p.imgKey=null;
+      p.videoSrc=null;
+      p.posterSrc=null;
+    }
+    renderEditor();
   };
   reader.readAsDataURL(input.files[0]);
+}
+
+function handleImgChange(id,input){
+  handleMediaChange(id,input);
 }
 
 function openAddModal(week){
@@ -1084,6 +1186,9 @@ function confirmAddPost(){
     nets: ['FB', 'IG'],
     imgKey: null,
     imgSrc: null,
+    mediaType: 'image',
+    videoSrc: null,
+    posterSrc: null,
     deleted: false,
     isNew: true
   };
@@ -1096,7 +1201,7 @@ function confirmAddPost(){
 
 async function saveProject(){
   refreshMetaFromInputs();
-  const data = JSON.stringify({ version: 2, meta: projectMeta, weeks: weeks, posts: posts }, null, 2);
+  const data = JSON.stringify({ version: 2.1, editorVersion: EDITOR_VERSION, meta: projectMeta, weeks: weeks, posts: posts }, null, 2);
   const filename = projectFileBase() + '.json';
   const title = [projectMeta.clientName, projectMeta.calendarTitle].filter(Boolean).join(' - ') || filename;
 
@@ -1169,27 +1274,46 @@ async function exportCalendar(){
   const active=posts.filter(p=>!p.deleted);
   const filename = projectFileBase() + '.html';
   const assetFolder = projectFileBase();
-  const exportImageSrc = {};
+  const exportMediaSrc = {};
+  const exportPosterSrc = {};
+
+  const inlineVideo = active.some(p => getMediaType(p) === 'video' && (/^data:video\//.test(getMediaSrc(p) || '') || /^data:image\//.test(getPoster(p) || '')));
+  if (inlineVideo && !projectRootHandle) {
+    alert('Para mantener el calendario liviano, conecta primero la carpeta del proyecto. Los reels se guardarán separados en calendarios_finales/assets/.');
+    return;
+  }
 
   if (projectRootHandle) {
-    let imageIndex = 0;
+    let mediaIndex = 0;
     for (const p of active) {
-      const imgSrc = getImg(p);
-      if (!imgSrc) continue;
-      if (!/^data:image\//.test(imgSrc)) {
-        exportImageSrc[p.id] = imgSrc;
+      const mediaSrc = getMediaSrc(p);
+      if (!mediaSrc) continue;
+      if (!/^data:(image|video)\//.test(mediaSrc)) {
+        exportMediaSrc[p.id] = mediaSrc;
         continue;
       }
-      const blob = dataUrlToBlob(imgSrc);
+      const blob = dataUrlToBlob(mediaSrc);
       if (!blob) {
-        exportImageSrc[p.id] = imgSrc;
+        exportMediaSrc[p.id] = mediaSrc;
         continue;
       }
-      imageIndex += 1;
-      const ext = imageExtensionFromDataUrl(imgSrc);
-      const imageName = 'post-' + String(imageIndex).padStart(2, '0') + '.' + ext;
-      await writeNestedFile(projectRootHandle, ['calendarios_finales', 'assets', assetFolder], imageName, blob, blob.type);
-      exportImageSrc[p.id] = 'assets/' + assetFolder + '/' + imageName;
+      mediaIndex += 1;
+      const prefix = getMediaType(p) === 'video' ? 'reel-' : 'post-';
+      const mediaName = prefix + String(mediaIndex).padStart(2, '0') + '.' + mediaExtensionFromDataUrl(mediaSrc);
+      await writeNestedFile(projectRootHandle, ['calendarios_finales', 'assets', assetFolder], mediaName, blob, blob.type);
+      exportMediaSrc[p.id] = 'assets/' + assetFolder + '/' + mediaName;
+
+      const posterSrc = getPoster(p);
+      if (getMediaType(p) === 'video' && /^data:image\//.test(posterSrc || '')) {
+        const posterBlob = dataUrlToBlob(posterSrc);
+        if (posterBlob) {
+          const posterName = 'reel-poster-' + String(mediaIndex).padStart(2, '0') + '.' + imageExtensionFromDataUrl(posterSrc);
+          await writeNestedFile(projectRootHandle, ['calendarios_finales', 'assets', assetFolder], posterName, posterBlob, posterBlob.type);
+          exportPosterSrc[p.id] = 'assets/' + assetFolder + '/' + posterName;
+        }
+      } else if (posterSrc) {
+        exportPosterSrc[p.id] = posterSrc;
+      }
     }
   }
 
@@ -1200,10 +1324,13 @@ async function exportCalendar(){
     if(wPosts.length > 0){
       body+='<div class="week-section"><div class="week-header"><div class="week-dot"></div><h2>'+escHtml(week)+'</h2><div class="week-line"></div></div><div class="posts-grid">';
       wPosts.forEach(p=>{
-        const imgSrc=exportImageSrc[p.id] || getImg(p);
-        const statusClass=p.status==='Finalizado'?'status-finalizado':p.status==='En Proceso'?'status-proceso':'status-programado';
+        const mediaType=getMediaType(p);
+        const mediaSrc=exportMediaSrc[p.id] || getMediaSrc(p);
+        const statusClass=p.status==='Finalizado' || p.status==='Publicado'?'status-finalizado':p.status==='En Proceso'?'status-proceso':'status-programado';
         const netBadges=p.nets.map(n=>'<span class="net-tag '+(n==='FB'?'net-fb':'net-ig')+'">'+(n==='FB'?'Facebook':'Instagram')+'</span>').join('');
-        body+='<div class="post-card" onclick="openImg(this)"><div class="post-image-wrap">'+(imgSrc?'<img src="'+imgSrc+'" alt="'+escHtml(p.title)+'" data-full="'+imgSrc+'" loading="lazy" decoding="async">':'<div class="pending-badge">Sin imagen</div>')+'</div><div class="post-info"><div class="post-meta"><span class="post-date">'+formatDate(p.date)+'</span><div class="post-networks">'+netBadges+'</div></div><p class="post-title">'+escHtml(p.title)+'</p><p class="post-caption">'+escHtml(p.caption)+'</p><div class="post-status '+statusClass+'"><div class="status-dot"></div>'+p.status+'</div></div></div>';
+        const posterSrc=exportPosterSrc[p.id] || getPoster(p);
+        const mediaMarkup=mediaSrc?(mediaType==='video'?'<video src="'+escHtml(mediaSrc)+'"'+(posterSrc?' poster="'+escHtml(posterSrc)+'"':'')+' controls muted playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;background:#111"></video>':'<img src="'+escHtml(mediaSrc)+'" alt="'+escHtml(p.title)+'" data-full="'+escHtml(mediaSrc)+'" loading="lazy" decoding="async">'):'<div class="pending-badge">Sin medio</div>';
+        body+='<div class="post-card" onclick="openImg(this)"><div class="post-image-wrap">'+mediaMarkup+'</div><div class="post-info"><div class="post-meta"><span class="post-date">'+formatDate(p.date)+'</span><div class="post-networks">'+netBadges+'</div></div><p class="post-title">'+escHtml(p.title)+'</p><p class="post-caption">'+escHtml(p.caption)+'</p><div class="post-status '+statusClass+'"><div class="status-dot"></div>'+p.status+'</div></div></div>';
       });
       body+='</div></div>';
     }

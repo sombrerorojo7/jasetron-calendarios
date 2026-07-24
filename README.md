@@ -118,12 +118,25 @@ Crea una versión etiquetada del sistema con inventario automático de archivos.
 
 - **Drag & Drop** tipo Kanban entre semanas y días
 - **Guardar/Cargar** proyectos en formato JSON estándar
-- **Imágenes personalizadas** cargadas desde la computadora
-- **Exportación HTML** autocontenida, sin dependencias
+- **Imágenes y reels** cargados desde la computadora, con portada opcional para video
+- **Exportación HTML** compatible con modo autocontenido y modo multimedia optimizado
+- **Exportación multimedia optimizada**: al conectar la carpeta del proyecto, imágenes y videos se guardan separados dentro de `calendarios_finales/assets/`
 - **Sin instalación** — funciona directamente en el navegador
 - **Deploy automático** — cualquier cambio en `main` se publica al instante
 - **Validación continua** — los HTML se verifican en cada push
 - **Releases versionadas** — historial de versiones con inventario automático
+
+### Formato multimedia del CSV
+
+Los CSV existentes siguen funcionando. Para indicar el tipo de recurso de forma explícita, se pueden agregar estas columnas:
+
+```csv
+Tipo,Arte (Archivo),Portada
+Imagen,post-01.png,
+Reel,reel-01.mp4,portada-reel-01.jpg
+```
+
+Si `Tipo` no existe, el editor detecta automáticamente extensiones de video como `.mp4`, `.webm`, `.mov` y `.m4v`. La versión multimedia mantiene la regla de peso: para exportar reels de forma optimizada hay que conectar la carpeta del proyecto; el HTML no debe incrustar videos grandes en base64.
 
 ---
 
