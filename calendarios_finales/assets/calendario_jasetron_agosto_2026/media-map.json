@@ -1,0 +1,82 @@
+{
+  "1": {
+    "type": "image",
+    "src": "assets/calendario_jasetron_agosto_2026/post-01.jpg"
+  },
+  "2": {
+    "type": "image",
+    "src": "assets/calendario_jasetron_agosto_2026/post-02.jpg"
+  },
+  "3": {
+    "type": "image",
+    "src": "assets/calendario_jasetron_agosto_2026/post-03.jpg"
+  },
+  "4": {
+    "type": "image",
+    "src": "assets/calendario_jasetron_agosto_2026/post-04.jpg"
+  },
+  "5": {
+    "type": "image",
+    "src": "assets/calendario_jasetron_agosto_2026/post-05.jpg"
+  },
+  "6": {
+    "type": "video",
+    "src": "assets/calendario_jasetron_agosto_2026/reel-01.mp4",
+    "poster": "assets/calendario_jasetron_agosto_2026/reel-01-poster.jpg"
+  },
+  "7": {
+    "type": "image",
+    "src": "assets/calendario_jasetron_agosto_2026/post-06.jpg"
+  },
+  "8": {
+    "type": "image",
+    "src": "assets/calendario_jasetron_agosto_2026/post-07.jpg"
+  },
+  "9": {
+    "type": "image",
+    "src": "assets/calendario_jasetron_agosto_2026/post-08.jpg"
+  },
+  "10": {
+    "type": "video",
+    "src": "assets/calendario_jasetron_agosto_2026/reel-02.mp4",
+    "poster": "assets/calendario_jasetron_agosto_2026/reel-02-poster.jpg"
+  },
+  "11": {
+    "type": "image",
+    "src": "assets/calendario_jasetron_agosto_2026/post-09.jpg"
+  },
+  "12": {
+    "type": "image",
+    "src": "assets/calendario_jasetron_agosto_2026/post-10.jpg"
+  },
+  "13": {
+    "type": "image",
+    "src": "assets/calendario_jasetron_agosto_2026/post-11.jpg"
+  },
+  "14": {
+    "type": "video",
+    "src": "assets/calendario_jasetron_agosto_2026/reel-03.mp4",
+    "poster": "assets/calendario_jasetron_agosto_2026/reel-03-poster.jpg"
+  },
+  "15": {
+    "type": "image",
+    "src": "assets/calendario_jasetron_agosto_2026/post-12.jpg"
+  },
+  "16": {
+    "type": "image",
+    "src": "assets/calendario_jasetron_agosto_2026/post-13.jpg"
+  },
+  "17": {
+    "type": "image",
+    "src": "assets/calendario_jasetron_agosto_2026/post-14.jpg"
+  },
+  "18": {
+    "type": "video",
+    "src": "assets/calendario_jasetron_agosto_2026/reel-04.mp4",
+    "poster": "assets/calendario_jasetron_agosto_2026/reel-04-poster.jpg"
+  },
+  "19": {
+    "type": "image",
+    "src": "assets/calendario_jasetron_agosto_2026/post-15.jpg"
+  }
+}
