@@ -911,7 +911,7 @@ function importMedia(input){
   const jobs = [];
   const unmatched = [];
   activePosts.forEach((post, index) => {
-    const expectedName = normalizeMediaFilename(post.mediaFile);
+    const expectedName = normalizeMediaFilename(post.mediaFile || post.sourceAsset);
     let file = files.find(f => !used.has(f) && expectedName && normalizeMediaFilename(f.name) === expectedName);
     if(!file){
       unmatched.push(expectedName || ('fila ' + (index + 1)));
@@ -1239,13 +1239,19 @@ function loadProject(input){
     try {
       const loaded = JSON.parse(e.target.result);
       if(Array.isArray(loaded)){
-        posts = loaded;
+        posts = loaded.map(post => Object.assign({
+          mediaFile: post.mediaFile || post.sourceAsset || '',
+          sourceAsset: post.sourceAsset || post.mediaFile || ''
+        }, post));
         nextId = Math.max(...posts.map(p=>p.id)) + 1;
         weeks = [...new Set([...weeks, ...posts.map(p=>p.week).filter(Boolean)])];
         renderEditor();
         showToast('📂 Cargado');
       } else if(loaded && Array.isArray(loaded.posts)){
-        posts = loaded.posts;
+        posts = loaded.posts.map(post => Object.assign({
+          mediaFile: post.mediaFile || post.sourceAsset || '',
+          sourceAsset: post.sourceAsset || post.mediaFile || ''
+        }, post));
         weeks = Array.isArray(loaded.weeks) && loaded.weeks.length ? loaded.weeks : [...new Set(posts.map(p=>p.week).filter(Boolean))];
         projectMeta = Object.assign({}, projectMeta, loaded.meta || {});
         nextId = posts.length ? Math.max(...posts.map(p=>p.id || 0)) + 1 : 1;
